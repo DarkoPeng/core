@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <script src="./dist/compiler-core.esm-bundler.js" type="module"></script>
+
+    <script type="module">
+      import { baseParse } from './'
+
+      const template = `
+        <div>
+          <p>hello world</p>  
+        </div>
+      `
+
+      const templateAST = baseParse(template)
+      console.log(templateAST)
+    </script>
+  </head>
+  <body></body>
+</html>

@@ -80,11 +80,15 @@ export const defaultParserOptions: MergedParserOptions = {
   comments: __DEV__
 }
 
+// 在 Vue 的编译器中，TextModes 是一个枚举类型，用于表示当前文本的上下文模式。这对于正确解析模板中的文本非常重要。以下是 TextModes 的定义：
 export const enum TextModes {
-  //          | Elements | Entities | End sign              | Inside of
-  DATA, //    | ✔        | ✔        | End tags of ancestors |
-  RCDATA, //  | ✘        | ✔        | End tag of the parent | <textarea>
-  RAWTEXT, // | ✘        | ✘        | End tag of the parent | <style>,<script>
+  // 普通文本模式
+  DATA,
+  // <div v-pre> 模式，其中的内容不会被编译
+  RCDATA, //
+  // {{ 插值 }} 模式
+  RAWTEXT,
+  // CDATA 模式，用于 SVG 中的 <style> 和 <script> 标签
   CDATA,
   ATTRIBUTE_VALUE
 }
@@ -101,6 +105,17 @@ export interface ParserContext {
   onWarn: NonNullable<ErrorHandlingOptions['onWarn']>
 }
 
+/**
+
+  1. 创建解析上下文：首先，parse 函数会创建一个解析上下文（context）
+    这个上下文包含了一些有关当前解析状态的信息，如当前的位置、原始模板字符串等。
+
+  2. 解析模板：然后，parse 函数会调用 parseChildren 函数来解析模板中的所有子节点。
+     parseChildren 函数会遍历模板中的所有子节点，
+     并调用 parseElement、parseInterpolation、parseText 等函数来解析各种类型的节点。
+
+  3. 创建 AST 根节点：最后，parse 函数会创建一个 AST 根节点，并将解析得到的子节点添加到这个根节点中。
+ */
 export function baseParse(
   content: string,
   options: ParserOptions = {}
@@ -140,6 +155,11 @@ function createParserContext(
   }
 }
 
+/**
+ *
+ * parseChildren 函数在 Vue3 的编译器中被用来解析元素的子节点。
+ * 这个函数会遍历模板中的所有子节点，包括元素节点、文本节点和注释节点，并将它们解析为抽象语法树（AST）的节点。
+ */
 function parseChildren(
   context: ParserContext,
   mode: TextModes,
@@ -1071,6 +1091,7 @@ function parseTextData(
   }
 }
 
+// 获取解析的起点位置
 function getCursor(context: ParserContext): Position {
   const { column, line, offset } = context
   return { column, line, offset }
